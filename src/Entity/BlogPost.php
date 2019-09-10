@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 
@@ -28,10 +30,7 @@ class BlogPost
      * @ORM\Column(type="text")
      */
     private $content;
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true) 
-     */
-    private $author;
+
     /**
      * @ORM\Column(type="string", length=255, nullable=true) 
      */
@@ -40,7 +39,22 @@ class BlogPost
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $publishedAt;
+    private $published;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="posts")
+     */
+    private $author;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="blogPost")
+     */
+    private $comments;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -73,18 +87,6 @@ class BlogPost
         return $this;
     }
 
-    public function getAuthor(): ?string
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(string $author): self
-    {
-        $this->author = $author;
-
-        return $this;
-    }
-
     /**
      * Get the value of slug
      */
@@ -105,14 +107,57 @@ class BlogPost
         return $this;
     }
 
-    public function getPublishedAt(): ?\DateTimeInterface
+    public function getPublished(): ?\DateTimeInterface
     {
-        return $this->publishedAt;
+        return $this->published;
     }
 
-    public function setPublishedAt(?\DateTimeInterface $publishedAt): self
+    public function setPublished(?\DateTimeInterface $published): self
     {
-        $this->publishedAt = $publishedAt;
+        $this->published = $published;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): self
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setBlogPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+            // set the owning side to null (unless already changed)
+            if ($comment->getBlogPost() === $this) {
+                $comment->setBlogPost(null);
+            }
+        }
 
         return $this;
     }
