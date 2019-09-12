@@ -7,10 +7,23 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BlogPostRepository")
- * @ApiResource()
+ * @ApiResource(
+ *         itemOperations={"get"={
+ *                              "access_control"="is_granted('ROLE_COMMENTATOR') and object.getAuthor() == user",
+ *                               "access_control_message"="Sorry, Badd authroszation."
+ *                          }},
+ *        collectionOperations={
+ *                      "get"={
+ *                              "access_control"="is_granted('ROLE_COMMENTATOR') and object.getAuthor() == user",
+ *                               "access_control_message"="Sorry, Badd authroszation."
+ *                          },
+ *                      "post"
+ * }
+ * )
  */
 class BlogPost
 {
@@ -22,22 +35,29 @@ class BlogPost
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true) 
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank()
      */
     private $title;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\NotBlank()
+     * @Assert\Length(min=15)
      */
     private $content;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true) 
+     * @Assert\NotBlank()
+     * @Assert\Length(min=5)
      */
     private $slug;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Assert\NotBlank()
+     * @Assert\DateTime()
      */
     private $published;
 
@@ -119,6 +139,9 @@ class BlogPost
         return $this;
     }
 
+    /**
+     * @return User
+     */
     public function getAuthor(): ?User
     {
         return $this->author;

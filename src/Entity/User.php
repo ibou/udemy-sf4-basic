@@ -13,8 +13,13 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ApiResource(
- *        collectionOperations={"post"},
- *         itemOperations={"get"},
+ *        collectionOperations={"get","post"},
+ *         itemOperations={
+ *                         "get"={
+ *                                 "access_control"="is_granted('IS_AUTHENTICATED_ANONYMOUSLY')",
+ *                                  "access_control_message"="Sorry, Sorry, you are not authorized to see this data."
+ *                          } 
+ *                  },
  *         normalizationContext={
  *           "groups"={"read"}
  *        },
