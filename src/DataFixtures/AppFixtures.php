@@ -9,7 +9,6 @@ use App\Security\TokenGenerator;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 class AppFixtures extends Fixture
 {
@@ -81,7 +80,8 @@ class AppFixtures extends Fixture
     public function __construct(
         UserPasswordEncoderInterface $passwordEncoder,
         TokenGenerator $tokenGenerator
-    ) {
+    )
+    {
         $this->passwordEncoder = $passwordEncoder;
         $this->faker = \Faker\Factory::create();
         $this->tokenGenerator = $tokenGenerator;
@@ -162,7 +162,7 @@ class AppFixtures extends Fixture
                 );
             }
 
-            $this->addReference('user_' . $userFixture['username'], $user);
+            $this->addReference('user_'.$userFixture['username'], $user);
 
             $manager->persist($user);
         }
@@ -175,31 +175,31 @@ class AppFixtures extends Fixture
         $randomUser = self::USERS[rand(0, 5)];
 
         if ($entity instanceof BlogPost && !count(
-            array_intersect(
-                $randomUser['roles'],
-                [User::ROLE_SUPERADMIN, User::ROLE_ADMIN, User::ROLE_WRITER]
-            )
-        )) {
+                array_intersect(
+                    $randomUser['roles'],
+                    [User::ROLE_SUPERADMIN, User::ROLE_ADMIN, User::ROLE_WRITER]
+                )
+            )) {
             return $this->getRandomUserReference($entity);
         }
 
         if ($entity instanceof Comment && !count(
-            array_intersect(
-                $randomUser['roles'],
-                [
-                    User::ROLE_SUPERADMIN,
-                    User::ROLE_ADMIN,
-                    User::ROLE_WRITER,
-                    User::ROLE_COMMENTATOR,
-                ]
-            )
-        )) {
+                array_intersect(
+                    $randomUser['roles'],
+                    [
+                        User::ROLE_SUPERADMIN,
+                        User::ROLE_ADMIN,
+                        User::ROLE_WRITER,
+                        User::ROLE_COMMENTATOR,
+                    ]
+                )
+            )) {
             return $this->getRandomUserReference($entity);
         }
 
 
         return $this->getReference(
-            'user_' . $randomUser['username']
+            'user_'.$randomUser['username']
         );
     }
 }
